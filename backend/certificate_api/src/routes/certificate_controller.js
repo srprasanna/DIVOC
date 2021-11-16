@@ -4,7 +4,6 @@ const Handlebars = require('handlebars');
 const puppeteer = require('puppeteer');
 const QRCode = require('qrcode');
 const JSZip = require("jszip");
-const {sendEvents} = require("../services/kafka_service");
 const registryService = require("../services/registry_service");
 const certificateService = require("../services/certificate_service");
 const {verifyToken, verifyKeycloakToken} = require("../services/auth_service");
@@ -15,6 +14,25 @@ const dcc = require("@pathcheck/dcc-sdk");
 
 const vaccineCertificateTemplateFilePath = `${__dirname}/../../configs/templates/certificate_template.html`;
 const testCertificateTemplateFilePath = `${__dirname}/../../configs/templates/test_certificate_template.html`;
+const config = require('./config/config');
+const sendEventsViaKafka = require("../services/rabbitmq_service.sendEventsViaKafka");
+const sendEventsViaRabbitmq = require("../services/kafka_service.sendEventsViaRabbitmq");
+const sendEvents =(() => {
+  switch (config.COMMUNICATION_MODE) {
+    case config.COMMUNICATION_MODE_RABBITMQ:
+      console.log('Choosen mode is RabbitMQ');
+      return sendEventsViaRabbitmq;
+    case config.COMMUNICATION_MODE_KAFKA:
+      console.log('Choosen mode is Kafka');
+      return sendEventsViaKafka;
+    case config.COMMUNICATION_MODE_RESTAPI:
+      console.log('Choosen mode is Rest-APIs');
+      console.error('Rest-API communication mode isn\'t supported yet');
+      return null;
+    default:
+      console.error(`Invalid COMMUNICATION_MODE, ${config.COMMUNICATION_MODE}.`);
+      return null;
+  })();
 
 function getNumberWithOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
@@ -563,4 +581,5 @@ module.exports = {
     certificateAsFHIRJson,
     getTestCertificatePDFByPreEnrollmentCode,
     certificateAsEUPayload
+    checkIfCertificateGenerated
 };

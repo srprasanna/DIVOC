@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+
 	"github.com/imroc/req"
 	"github.com/jinzhu/configor"
 	log "github.com/sirupsen/logrus"
@@ -63,6 +64,16 @@ var Config = struct {
 		ReportedSideEffectsTopic string `default:"reported_side_effects" yaml:"reportedSideEffectsTopic"`
 		EnrollmentACKTopic       string `default:"enrollment_ack" yaml:"enrollmentacktopic"`
 	}
+	Rabbitmq struct {
+		RabbitmqServers          string `env:"RABBITMQ_SERVER" yaml:"rabbitmqServers"`
+		Certified                string `default:"certified" yaml:"certifiedtopic"`
+		CertifyAck               string `default:"certify_ack" yaml:"certifyacktopic"`
+		CertifyTopic             string `default:"certify" yaml:"certifyTopic"`
+		EnrollmentTopic          string `default:"enrollment" yaml:"enrollmenttopic"`
+		EventsTopic              string `default:"events" yaml:"eventsTopic"`
+		ReportedSideEffectsTopic string `default:"reported_side_effects" yaml:"reportedSideEffectsTopic"`
+		EnrollmentACKTopic       string `default:"enrollment_ack" yaml:"enrollmentacktopic"`
+	}
 	Database struct {
 		Host     string `default:"localhost" yaml:"host" env:"DB_HOST"`
 		Password string `default:"postgres" yaml:"password" env:"DB_PASSWORD"`
@@ -97,5 +108,8 @@ var Config = struct {
 	}
 	Auth struct {
 		RegistrationAPIPublicKey string `yaml:"registrationAPIPublickey" env:"REGISTRATION_API_PUBLIC_KEY"`
+	}
+	CommunicationMode struct {
+		Mode string `env:"COMMUNICATION_MODE" default:"rabbitmq"`
 	}
 }{}
